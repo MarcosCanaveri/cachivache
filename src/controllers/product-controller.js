@@ -6,27 +6,42 @@ class ProductController {
         this.repository = repository;
     }
 
-    getAll = async (req, res, next) => {
-        try {
-            const { page, limit, sort, query } = req.query;
-            const response = await this.repository.getAll(page, limit, sort, query);
-            res.json({
-                totalDocs: response.totalDocs,
-                status: 'success',
-                payload: response.docs,
-                totalPages: response.totalPages,
-                prevPage: response.prevPage,
-                nextPage: response.nextPage,
-                page: response.page,
-                hasPrevPage: response.hasPrevPage,
-                hasNextPage: response.hasNextPage,
-                prevLink: response.hasPrevPage ? `http://localhost:8080/api/products?page=${response.prevPage}&limit=${limit}` : null,
-                nextLink: response.hasNextPage ? `http://localhost:8080/api/products?page=${response.nextPage}&limit=${limit}` : null
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+getAll = async (req, res, next) => {
+    try {
+        
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        const { sort, query } = req.query;
+
+       
+        const response = await this.repository.getAll(page, limit, sort, query);
+       
+        const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+        const createLink = (targetPage) => {
+            let link = `${baseUrl}?page=${targetPage}&limit=${limit}`;
+            if (sort) link += `&sort=${sort}`;
+            if (query) link += `&query=${query}`;
+            return link;
+        };
+
+        
+        res.json({
+            status: 'success', 
+            payload: response.docs, 
+            totalPages: response.totalPages,
+            prevPage: response.prevPage,
+            nextPage: response.nextPage,
+            page: response.page,
+            hasPrevPage: response.hasPrevPage,
+            hasNextPage: response.hasNextPage,
+            prevLink: response.hasPrevPage ? createLink(response.prevPage) : null,
+            nextLink: response.hasNextPage ? createLink(response.nextPage) : null
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'error', payload: null });
+    }
+};
+
 
     getById = async (req, res, next) => {
         try {

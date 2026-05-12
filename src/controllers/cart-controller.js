@@ -41,7 +41,9 @@ class CartController {
     update = async (req, res, next) => {
         try {
             const { cid } = req.params;
-            const response = await this.repository.update(cid, req.body);
+            const products = Array.isArray(req.body) ? req.body : req.body.products;
+            if (!products) throw new CustomError('Products array is required', 400);
+            const response = await this.repository.update(cid, products);
             if (!response) throw new CustomError('Cart not found', 404);
             res.json({ status: 'success', payload: response });
         } catch (error) {
@@ -112,8 +114,8 @@ class CartController {
             const response = await this.repository.updateCartProducts(cid, products);
             if (!response) throw new CustomError('Cart not found', 404);
             res.json({ status: 'success', payload: response });
-    } catch (error) {            
-        next(error);
+        } catch (error) {
+            next(error);
         }
     };
 

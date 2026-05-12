@@ -16,7 +16,7 @@ class CartRepository {
 
     getById = async (cid) => {
         try {
-            return await this.model.findById(cid).populate('products.product', { _id: 0 });
+            return await this.model.findById(cid).populate('products.product');
         } catch (error) {
             throw new Error(error);
         }
