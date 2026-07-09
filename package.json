@@ -13,6 +13,6 @@
   "dependencies": {
     "express": "^5.2.1",
     "mongoose": "^9.6.0",
-    "mongoose-paginate-v2": "^1.9.4"
+    "mongoose-paginate-v2": "^1.9.5"
   }
 }

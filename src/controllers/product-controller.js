@@ -6,41 +6,41 @@ class ProductController {
         this.repository = repository;
     }
 
-getAll = async (req, res, next) => {
-    try {
-        
-        const limit = parseInt(req.query.limit) || 10;
-        const page = parseInt(req.query.page) || 1;
-        const { sort, query } = req.query;
-
-       
-        const response = await this.repository.getAll(page, limit, sort, query);
-       
-        const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
-        const createLink = (targetPage) => {
-            let link = `${baseUrl}?page=${targetPage}&limit=${limit}`;
-            if (sort) link += `&sort=${sort}`;
-            if (query) link += `&query=${query}`;
-            return link;
-        };
+    getAll = async (req, res, next) => {
+        try {
+            
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+            const { sort, query } = req.query;
 
         
-        res.json({
-            status: 'success', 
-            payload: response.docs, 
-            totalPages: response.totalPages,
-            prevPage: response.prevPage,
-            nextPage: response.nextPage,
-            page: response.page,
-            hasPrevPage: response.hasPrevPage,
-            hasNextPage: response.hasNextPage,
-            prevLink: response.hasPrevPage ? createLink(response.prevPage) : null,
-            nextLink: response.hasNextPage ? createLink(response.nextPage) : null
-        });
-    } catch (error) {
-        res.status(500).json({ status: 'error', payload: null });
-    }
-};
+            const response = await this.repository.getAll(page, limit, sort, query);
+        
+            const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+            const createLink = (targetPage) => {
+                let link = `${baseUrl}?page=${targetPage}&limit=${limit}`;
+                if (sort) link += `&sort=${sort}`;
+                if (query) link += `&query=${query}`;
+                return link;
+            };
+
+            
+            res.json({
+                status: 'success', 
+                payload: response.docs, 
+                totalPages: response.totalPages,
+                prevPage: response.prevPage,
+                nextPage: response.nextPage,
+                page: response.page,
+                hasPrevPage: response.hasPrevPage,
+                hasNextPage: response.hasNextPage,
+                prevLink: response.hasPrevPage ? createLink(response.prevPage) : null,
+                nextLink: response.hasNextPage ? createLink(response.nextPage) : null
+            });
+        } catch (error) {
+            res.status(500).json({ status: 'error', payload: null });
+        }
+    };
 
 
     getById = async (req, res, next) => {
